@@ -11,7 +11,6 @@ export const meta = () => {
 
 const auth = () => {
   const { isLoading, auth } = usePuterStore();
-  console.log({ isLoading, isAuthenticated: auth.isAuthenticated })
   const location = useLocation();
   const next = location.search.split("next=")[1];
   const navigate = useNavigate();
