@@ -70,16 +70,54 @@ const upload = () => {
           ? feedback.message.content
           : feedback.message.content[0].text;
 
-      data.feedback = JSON.parse(feedbackText);
+      // Check if the response is valid JSON before parsing
+      // If AI limit is reached, the API returns plain text error messages
+      try {
+        data.feedback = JSON.parse(feedbackText);
+      } catch (parseError) {
+        // Check if it's an AI limit error
+        if (
+          feedbackText.toLowerCase().includes("limit") ||
+          feedbackText.toLowerCase().includes("your") ||
+          feedbackText.toLowerCase().includes("quota") ||
+          feedbackText.toLowerCase().includes("exceeded")
+        ) {
+          setStatusText(
+            "Error: AI usage limit reached. Please upgrade your plan."
+          );
+        } else {
+          setStatusText(
+            `Error: Unable to process AI response. The service may be temporarily unavailable.`
+          );
+        }
+        setIsProcessing(false);
+        console.error("Failed to parse AI response:", feedbackText);
+        return;
+      }
+
       await kv.set(`resume:${uuid}`, JSON.stringify(data));
       setStatusText("Analysis complete, redirecting...");
       console.log(data);
       navigate(`/resume/${uuid}`);
     } catch (error) {
       console.error(error);
-      setStatusText(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      // Check if the error message indicates AI limit issues
+      if (
+        errorMessage.toLowerCase().includes("limit") ||
+        errorMessage.toLowerCase().includes("quota") ||
+        errorMessage.toLowerCase().includes("exceeded")
+      ) {
+        setStatusText(
+          "Error: AI usage limit reached. Please upgrade your plan."
+        );
+      } else {
+        setStatusText(`Error: ${errorMessage}`);
+      }
+      setIsProcessing(false);
+      return
     }
   };
 
