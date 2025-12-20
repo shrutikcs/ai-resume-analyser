@@ -70,10 +70,28 @@ const upload = () => {
           ? feedback.message.content
           : feedback.message.content[0].text;
 
+      // Helper function to clean markdown code fences from JSON responses
+      const cleanJsonResponse = (text: string): string => {
+        // Remove markdown code fences if present
+        let cleaned = text.trim();
+
+        // Check if the response starts with ```json or ``` and ends with ```
+        if (cleaned.startsWith("```json")) {
+          cleaned = cleaned
+            .replace(/^```json\s*\n?/, "")
+            .replace(/\n?```\s*$/, "");
+        } else if (cleaned.startsWith("```")) {
+          cleaned = cleaned.replace(/^```\s*\n?/, "").replace(/\n?```\s*$/, "");
+        }
+
+        return cleaned.trim();
+      };
+
       // Check if the response is valid JSON before parsing
       // If AI limit is reached, the API returns plain text error messages
       try {
-        data.feedback = JSON.parse(feedbackText);
+        const cleanedFeedback = cleanJsonResponse(feedbackText);
+        data.feedback = JSON.parse(cleanedFeedback);
       } catch (parseError) {
         // Check if it's an AI limit error
         if (
@@ -117,7 +135,7 @@ const upload = () => {
         setStatusText(`Error: ${errorMessage}`);
       }
       setIsProcessing(false);
-      return
+      return;
     }
   };
 
