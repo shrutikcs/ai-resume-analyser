@@ -1,4 +1,4 @@
-# 🎯 AI Resume Analyser
+# AI Resume Analyser
 
 > **Smart feedback for your dream job** - Get AI-powered resume analysis with ATS scoring and personalized improvement tips.
 
@@ -8,80 +8,65 @@
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1.13-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Puter.js](https://img.shields.io/badge/Puter.js-Cloud-FF6B6B?style=flat)](https://puter.com/)
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Screenshots](#-screenshots)
-- [Tech Stack](#-tech-stack)
-- [Getting Started](#-getting-started)
-- [Project Structure](#-project-structure)
-- [How It Works](#-how-it-works)
-- [Environment Setup](#-environment-setup)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Overview](#overview)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Sequence Diagram](#sequence-diagram)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [How It Works](#how-it-works)
+- [Environment Setup](#environment-setup)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
-## 🌟 Overview
+## Overview
 
 AI Resume Analyser is a modern web application that helps job seekers optimize their resumes using AI-powered analysis. Upload your resume, provide job details, and receive comprehensive feedback on ATS compatibility, content quality, structure, tone, and skills alignment.
 
 The application leverages **Puter.js** for cloud storage, authentication, and AI capabilities, providing a seamless experience without the need for traditional backend infrastructure.
 
-## ✨ Features
+## Features
 
-### 🤖 AI-Powered Analysis
+### AI-Powered Analysis
 
 - **Comprehensive Scoring**: Get detailed scores across 5 key categories:
-  - 📊 **ATS Compatibility** - Ensure your resume passes Applicant Tracking Systems
-  - 🎨 **Tone & Style** - Professional language and formatting assessment
-  - 📝 **Content Quality** - Relevance and impact of your experience
-  - 🏗️ **Structure** - Organization and readability evaluation
-  - 💼 **Skills Alignment** - Match with job requirements
+  - **ATS Compatibility** - Ensure your resume passes Applicant Tracking Systems
+  - **Tone & Style** - Professional language and formatting assessment
+  - **Content Quality** - Relevance and impact of your experience
+  - **Structure** - Organization and readability evaluation
+  - **Skills Alignment** - Match with job requirements
 
-### 📤 Smart Upload System
+### Smart Upload System
 
 - Drag-and-drop PDF resume upload
 - Automatic PDF to image conversion for preview
 - Job-specific analysis with company name, job title, and description
 
-### 📈 Visual Feedback
+### Visual Feedback
 
 - Interactive score gauges and progress indicators
 - Color-coded improvement suggestions (good vs. needs improvement)
 - Detailed explanations for each recommendation
 - Side-by-side resume preview with feedback
 
-### 🔐 Secure & Private
+### Secure & Private
 
 - User authentication via Puter.js
 - Cloud-based storage for your resumes and analysis
 - Personal dashboard to track all submissions
 
-### 📱 Responsive Design
+### Responsive Design
 
 - Beautiful, modern UI with glassmorphism effects
 - Fully responsive across desktop, tablet, and mobile devices
 - Smooth animations and transitions
 
-## 📸 Screenshots
 
-> **Note**: Add your screenshots here
-
-### Homepage
-
-
-![alt text]({C09462BA-B2EE-482C-8387-BBC7F6828702}.png)
-
-_Track all your resume submissions and their scores_
-
-### Upload & Analysis
-
-![alt text]({529509C6-27DD-475B-90BA-C15EC30857BE}.png)
-_Upload your resume and provide job details for tailored feedback_
-
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 
@@ -94,10 +79,10 @@ _Upload your resume and provide job details for tailored feedback_
 ### Backend & Services
 
 - **[Puter.js](https://puter.com/)** - Cloud platform providing:
-  - 🔐 Authentication
-  - 📁 File Storage (FS)
-  - 🤖 AI Chat API (OpenAI o1 model)
-  - 🗄️ Key-Value Store
+  - Authentication
+  - File Storage (FS)
+  - AI Chat API (Claude model)
+  - Key-Value Store
 
 ### Tools & Libraries
 
@@ -105,7 +90,72 @@ _Upload your resume and provide job details for tailored feedback_
 - **[react-dropzone](https://react-dropzone.js.org/)** - File upload component
 - **[Vite](https://vitejs.dev/)** - Fast build tool and dev server
 
-## 🚀 Getting Started
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend as React Frontend
+    participant Auth as Puter.js Auth
+    participant Storage as Puter.js Cloud Storage
+    participant PDF as PDF.js
+    participant AI as Puter.js AI (Claude)
+    participant KV as Puter.js KV Store
+
+    rect rgb(240, 248, 255)
+        Note over User, Auth: Authentication Flow
+        User->>Frontend: Open App
+        Frontend->>Auth: Check Auth Status
+        Auth-->>Frontend: Not Authenticated
+        Frontend-->>User: Show Login Page
+        User->>Auth: Sign In
+        Auth-->>Frontend: Auth Token + User Info
+        Frontend-->>User: Show Dashboard
+    end
+
+    rect rgb(245, 255, 245)
+        Note over User, Storage: Resume Upload Flow
+        User->>Frontend: Upload Resume (PDF) + Job Details
+        Frontend->>Storage: Upload PDF File
+        Storage-->>Frontend: File Path
+        Frontend->>PDF: Convert PDF to Image
+        PDF-->>Frontend: Image Blob
+        Frontend->>Storage: Upload Preview Image
+        Storage-->>Frontend: Image Path
+    end
+
+    rect rgb(255, 248, 240)
+        Note over Frontend, KV: Data Persistence
+        Frontend->>KV: Store Resume Metadata (UUID)
+        KV-->>Frontend: Success
+    end
+
+    rect rgb(248, 240, 255)
+        Note over Frontend, AI: AI Analysis Flow
+        Frontend->>AI: Send Resume + Job Context
+        Note right of AI: Analyzes across 5 dimensions:<br/>ATS, Tone, Content,<br/>Structure, Skills
+        AI-->>Frontend: JSON Feedback (Scores + Tips)
+    end
+
+    rect rgb(255, 245, 245)
+        Note over Frontend, KV: Save Results
+        Frontend->>KV: Update with AI Feedback
+        KV-->>Frontend: Success
+        Frontend-->>User: Redirect to Results Page
+    end
+
+    rect rgb(240, 255, 255)
+        Note over User, Storage: View Results Flow
+        User->>Frontend: View Resume Results
+        Frontend->>KV: Fetch Resume Data
+        KV-->>Frontend: Resume + Feedback JSON
+        Frontend->>Storage: Fetch PDF + Image
+        Storage-->>Frontend: File Blobs
+        Frontend-->>User: Display Scores, Tips & Resume Preview
+    end
+```
+
+## Getting Started
 
 ### Prerequisites
 
@@ -143,7 +193,7 @@ npm run build
 npm run start
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ai-resume-analyser/
@@ -184,23 +234,23 @@ ai-resume-analyser/
 └── README.md
 ```
 
-## 🔄 How It Works
+## How It Works
 
-### 1. **Authentication**
+### 1. Authentication
 
 Users sign in via Puter.js authentication, which provides a secure cloud storage space for each user.
 
-### 2. **Resume Upload**
+### 2. Resume Upload
 
 - User uploads a PDF resume via drag-and-drop
 - Resume is uploaded to Puter.js cloud storage
 - PDF is converted to an image for preview using `pdfjs-dist`
 - Image is also uploaded to cloud storage
 
-### 3. **AI Analysis**
+### 3. AI Analysis
 
 - User provides job details (company, title, description)
-- Application sends resume + job context to Puter.js AI API (OpenAI o1 model)
+- Application sends resume + job context to Puter.js AI API (Claude model)
 - AI analyzes the resume across 5 dimensions:
   - ATS compatibility
   - Tone and style
@@ -208,7 +258,7 @@ Users sign in via Puter.js authentication, which provides a secure cloud storage
   - Structure
   - Skills alignment
 
-### 4. **Feedback Storage**
+### 4. Feedback Storage
 
 - Analysis results are stored in Puter.js Key-Value store
 - Each resume gets a unique UUID
@@ -225,13 +275,13 @@ Users sign in via Puter.js authentication, which provides a secure cloud storage
   }
   ```
 
-### 5. **Dashboard & Review**
+### 5. Dashboard & Review
 
 - Users can view all their submitted resumes
 - Click on any resume to see detailed feedback
 - Side-by-side view of resume and AI suggestions
 
-## 🔧 Environment Setup
+## Environment Setup
 
 ### Puter.js Configuration
 
@@ -249,11 +299,11 @@ If you want to modify the AI model or prompts:
 2. Modify the model in `app/lib/puter.ts` (line 354):
    ```typescript
    {
-     model: "o1";
+     model: "claude-sonnet-4.5";
    } // Change to other supported models
    ```
 
-## 🐳 Deployment
+## Deployment
 
 ### Docker Deployment
 
@@ -281,7 +331,7 @@ npm run build
 
 Then deploy the `build/` directory to your hosting provider.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -299,18 +349,18 @@ Contributions are welcome! Here's how you can help:
 - Test across different browsers
 - Ensure responsive design
 
-## 📝 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **[Puter.js](https://puter.com/)** - For providing the cloud infrastructure and AI capabilities
 - **[React Router](https://reactrouter.com/)** - For the excellent routing framework
 - **[TailwindCSS](https://tailwindcss.com/)** - For the utility-first CSS framework
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** - For PDF rendering capabilities
 
-## 📧 Contact
+## Contact
 
 Have questions or suggestions? Feel free to:
 
@@ -322,8 +372,8 @@ Have questions or suggestions? Feel free to:
 
 <div align="center">
 
-**Made with ❤️ for job seekers everywhere**
+**Made with love for job seekers everywhere**
 
-[⬆ Back to Top](#-ai-resume-analyser)
+[Back to Top](#ai-resume-analyser)
 
 </div>
